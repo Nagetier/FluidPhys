@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.Door;
 
@@ -30,34 +31,56 @@ public class DoorPhys implements Listener
 				
 		//Left or Right click?
 		if ((action == Action.RIGHT_CLICK_BLOCK) || (action == Action.LEFT_CLICK_BLOCK))
-		{
+		{			
 			//Door Block?
 			if(isDoor(clicked))
-			{
-				//Send Material to waterdoor function, no need to change over and over....
-				
+			{	
+				//Send Material to waterdoor function, no need to change over and over....				
 				Material btype = clicked.getType();
-				Door door = (Door) btype.getNewData((clicked.getData()));
+				Door door = (Door) btype.getNewData((clicked.getData()));				
 				
-				log.info("Door!?");
-				waterThroughDoor(door, clicked);
+				//Check if door is open				
+				if(door.isOpen() == true)
+				{				
+					log.info("We got a open door here!");
+					waterThroughDoor(door, clicked);
+				}
+				else
+				{
+					log.info("We got a closed door here!");
+				}
 			}
 			else
 			{
-				log.info("no door!");
+				log.info("Sorry, no door found!");
 			}
 		}
 		else{	}
 	}
 	
+	@EventHandler
+	public void onRedstoneDoor(BlockRedstoneEvent event)
+	{
+		Block block = event.getBlock();
+		if(isDoor(block))
+		{
+			Material btype = block.getType();
+			Door door = (Door) btype.getNewData(block.getData());
+			
+			log.info("RedstoneDoor!");
+			waterThroughDoor(door, block);
+		}
+		else
+		{
+			log.info("No RedstoneDoor!");
+		}
+	}
 	
 	
 	
 	@SuppressWarnings("unused")
 	private void waterThroughDoor(Door door, Block doorblock)
 	{
-		log.info("Door!");
-		
 		//Blocks touching the door (Only selecting the upper ones, need to get the lower ones!
 		BlockFace facing = door.getFacing();		
 		Block block_front = doorblock.getRelative(facing);
@@ -88,15 +111,22 @@ public class DoorPhys implements Listener
 		if(b_back.isLiquid() || b_back_lower.isLiquid() || b_front.isLiquid() || b_front_lower.isLiquid())
 		{
 			log.info("Liquid!");
+			
+			//Checking which blocks are water
+			
 		}
-		
+		else
+		{
+			log.info("No Liquid!");
+		}
 	}
 	
 	private boolean isDoor(Block clicked_block)
 	{
 		Material btype = clicked_block.getType();
+		log.info(btype.toString() + " found as material!");
 		
-		if((btype == Material.WOODEN_DOOR) || (btype == Material.IRON_DOOR))
+		if((btype == Material.WOODEN_DOOR) || (btype == Material.IRON_DOOR_BLOCK))
 		{
 			return true;
 		}
@@ -106,4 +136,13 @@ public class DoorPhys implements Listener
 		}
 	}
 	
+	private Block updateBlock(Block block)
+	{
+		Block updatedBlock;
+		//Update Location and check what kind of block is here!
+		Location loc = block.getLocation();
+		updatedBlock = loc.getBlock();		
+		
+		return updatedBlock;
+	}
 }
