@@ -136,6 +136,8 @@ public class DoorPhys implements Listener
 		}
 	}
 	
+	
+	@SuppressWarnings("unused")
 	private Block updateBlock(Block block)
 	{
 		Block updatedBlock;
