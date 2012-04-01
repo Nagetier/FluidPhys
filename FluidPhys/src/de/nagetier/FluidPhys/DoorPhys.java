@@ -113,7 +113,7 @@ public class DoorPhys implements Listener
 			log.info("Liquid!");
 			
 			//Checking which blocks are water
-			
+			//Upper/Lower - which sides?!
 		}
 		else
 		{
